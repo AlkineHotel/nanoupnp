@@ -694,8 +694,11 @@ static int igd_candidate_urls(char urls[][UPNP_URL_MAX], int max_urls) {
     static const char *PATHS[] = {
         "http://%s:1900/igd.xml",
         "http://%s:1900/rootDesc.xml",
-        "http://%s:5000/rootDesc.xml",
-        "http://%s:49152/rootDesc.xml",
+        "http://%s:5000/rootDesc.xml",    /* Synology NAS, QNAP */
+        "http://%s:8080/rootDesc.xml",   /* ASUS */
+        "http://%s:49000/igddesc.xml",   /* Fritz!Box (AVM) */
+        "http://%s:49000/rootDesc.xml",  /* Fritz!Box alternate */
+        "http://%s:49152/rootDesc.xml",  /* Netgear, Belkin */
         NULL
     };
     static const unsigned char LAST_OCTETS[] = {1, 254};
