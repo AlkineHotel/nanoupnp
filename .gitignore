@@ -2,5 +2,7 @@ example/map_port
 example/map_port.exe
 test/test_upnp
 test/test_upnp.exe
+test/test_live
+test/test_live.exe
 *.o
 *.a
