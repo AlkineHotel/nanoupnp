@@ -133,6 +133,26 @@ eliminates this window entirely.
 
 ---
 
+## Router compatibility
+
+SSDP (step 1) is spec-compliant and works with any UPnP-enabled router.
+
+The direct gateway probe fallback (step 2) tries these ports:
+
+| Port  | Covers |
+|-------|--------|
+| 1900  | Eero, Apple AirPort, most consumer routers |
+| 5000  | Synology, QNAP, some Netgear |
+| 8080  | ASUS |
+| 49000 | AVM Fritz!Box (`/igddesc.xml`) |
+| 49152 | Netgear Nighthawk, Belkin, some Linksys |
+
+The fallback is only reached when SSDP multicast is filtered. Most routers
+respond to SSDP and never need it. If you hit a router where both SSDP and
+the probe fail, open an issue with the port your router uses.
+
+---
+
 ## License
 
 MIT
