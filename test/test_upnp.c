@@ -38,7 +38,7 @@ static void report(const char *name, int ok) {
 
 int main(void) {
     printf("c-upnp-igd smoke test\n");
-    printf("─────────────────────\n");
+    printf("---------------------\n");
 
 #ifdef _WIN32
     WSADATA wsa;
@@ -68,7 +68,7 @@ int main(void) {
         printf("  SKIP  (remaining tests require successful mapping)\n");
     }
 
-    printf("─────────────────────\n");
+    printf("---------------------\n");
     printf("  %d passed, %d failed\n", passed, failed);
 
     if (!ok) {
