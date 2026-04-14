@@ -1,5 +1,7 @@
 # c-upnp-igd
 
+[![CI](https://github.com/AlkineHotel/c-upnp-igd/actions/workflows/ci.yml/badge.svg)](https://github.com/AlkineHotel/c-upnp-igd/actions/workflows/ci.yml)
+
 A minimal, zero-dependency UPnP IGD port mapping client in C.
 
 Drop `upnp.c` and `upnp.h` into any C project to open public ports on a
