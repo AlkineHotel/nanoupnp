@@ -1,4 +1,4 @@
-# Makefile for c-upnp-igd
+# Makefile for nanoupnp
 #
 # Targets:
 #   make              — build example (Linux/macOS)

@@ -1,4 +1,4 @@
-# c-upnp-igd
+# nanoupnp
 
 A minimal, zero-dependency UPnP IGD port mapping client in C.
 
@@ -15,7 +15,7 @@ UPnP-capable router — no build system, no third-party libraries, no cmake.
 it's 30+ files, requires a build step, and adds a meaningful dependency surface
 to any project that uses it.
 
-`c-upnp-igd` is two files. It implements exactly the four SOAP actions needed
+`nanoupnp` is two files. It implements exactly the four SOAP actions needed
 to open and close a port mapping — nothing more.
 
 ---

@@ -1,5 +1,5 @@
 /*
- * test_upnp.c — smoke test for c-upnp-igd
+ * test_upnp.c — smoke test for nanoupnp
  *
  * Runs the full IGD sequence and exits with a clear pass/fail:
  *   - discovers the IGD (SSDP or gateway probe)
@@ -37,7 +37,7 @@ static void report(const char *name, int ok) {
 }
 
 int main(void) {
-    printf("c-upnp-igd smoke test\n");
+    printf("nanoupnp smoke test\n");
     printf("---------------------\n");
 
 #ifdef _WIN32

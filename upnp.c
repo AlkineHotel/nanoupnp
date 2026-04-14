@@ -931,7 +931,7 @@ int upnp_request_mapping(unsigned short port, const char *proto,
             "<NewInternalPort>%u</NewInternalPort>"
             "<NewInternalClient>%s</NewInternalClient>"
             "<NewEnabled>1</NewEnabled>"
-            "<NewPortMappingDescription>c-upnp-igd %s/%u</NewPortMappingDescription>"
+            "<NewPortMappingDescription>nanoupnp %s/%u</NewPortMappingDescription>"
             "<NewLeaseDuration>%d</NewLeaseDuration>",
             port, proto, port, local_ip, proto, port, lease);
         Sbuf r2;

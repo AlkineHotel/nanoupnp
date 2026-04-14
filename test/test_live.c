@@ -1,5 +1,5 @@
 /*
- * test_live.c — interactive port-open test for c-upnp-igd
+ * test_live.c — interactive port-open test for nanoupnp
  *
  * Opens a UPnP port mapping AND binds a local socket on that port so
  * inbound traffic actually has somewhere to land.  Proves end-to-end
@@ -150,7 +150,7 @@ int main(int argc, char *argv[]) {
     }
 #endif
 
-    printf("c-upnp-igd live test\n");
+    printf("nanoupnp live test\n");
     printf("--------------------\n");
     printf("Requesting %s/%u mapping...\n\n", proto, port);
 

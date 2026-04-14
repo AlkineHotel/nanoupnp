@@ -1,5 +1,5 @@
 /*
- * map_port.c — minimal example using c-upnp-igd
+ * map_port.c — minimal example using nanoupnp
  *
  * Opens a TCP port mapping, prints the public address, waits for Ctrl+C,
  * then releases the mapping before exit.
