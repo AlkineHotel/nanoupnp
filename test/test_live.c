@@ -82,6 +82,9 @@ static void run_udp_listener(unsigned short port) {
     SOCKET s = socket(AF_INET, SOCK_DGRAM, 0);
     if (s == INVALID_SOCKET) { perror("socket"); return; }
 
+    int opt = 1;
+    setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (const char*)&opt, sizeof(opt));
+
     struct sockaddr_in addr = {0};
     addr.sin_family      = AF_INET;
     addr.sin_addr.s_addr = INADDR_ANY;
@@ -94,17 +97,38 @@ static void run_udp_listener(unsigned short port) {
     printf("UDP listener bound on :%u -- waiting for packets...\n", port);
     printf("Press Ctrl+C to release the mapping and exit.\n\n");
 
+#ifdef _WIN32
+    /* Prime the Eero/Hyper-V NAT state table: some routers only open the
+     * inbound UDP pinhole after seeing at least one outbound packet from
+     * this socket.  Send a harmless zero-byte datagram to a public DNS
+     * server — it won't reply, but the NAT table entry gets created. */
+    {
+        struct sockaddr_in prime = {0};
+        prime.sin_family = AF_INET;
+        prime.sin_port   = htons(53);
+        inet_pton(AF_INET, "8.8.8.8", &prime.sin_addr);
+        sendto(s, "", 0, 0, (struct sockaddr*)&prime, sizeof(prime));
+    }
+#endif
     char buf[512];
     while (1) {
         struct sockaddr_in peer = {0};
         socklen_t plen = sizeof(peer);
         int n = (int)recvfrom(s, buf, sizeof(buf)-1, 0,
                               (struct sockaddr*)&peer, &plen);
-        if (n <= 0) break;
+        if (n < 0) {
+#ifdef _WIN32
+            /* Windows returns WSAECONNRESET when a previous send triggered
+             * an ICMP port-unreachable.  Not fatal — just ignore and loop. */
+            if (WSAGetLastError() == WSAECONNRESET) continue;
+#endif
+            break;
+        }
+        /* n == 0 is a valid empty UDP datagram (e.g. nping default) */
         buf[n] = '\0';
         char ipstr[48];
         inet_ntop(AF_INET, &peer.sin_addr, ipstr, sizeof(ipstr));
-        printf("  [UDP] %d bytes from %s:%u\n", n, ipstr, ntohs(peer.sin_port));
+        printf("  [UDP] packet from %s:%u (%d payload bytes)\n", ipstr, ntohs(peer.sin_port), n);
         /* echo back so nping sees a reply */
         sendto(s, buf, n, 0, (struct sockaddr*)&peer, plen);
     }

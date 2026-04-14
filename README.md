@@ -133,7 +133,32 @@ eliminates this window entirely.
 
 ---
 
-## Router compatibility
+## Testing
+
+**Automated smoke test** — discovers IGD, maps port, verifies fields, releases. Exits 0 on pass.
+```bash
+make test                        # Linux/macOS
+.\test\test_upnp.exe             # Windows
+```
+
+**Live reachability test** — maps port, binds a real socket, holds it open for external probing.
+```bash
+.\test\test_live.exe             # TCP/9999 (default)
+.\test\test_live.exe 9999 UDP    # UDP/9999
+
+# From another terminal (hairpin NAT works fine from same LAN):
+nping --tcp -p 9999 <ext_ip>
+nping --udp -p 9999 <ext_ip>
+nc -zv <ext_ip> 9999
+```
+
+TCP: nping receives SYN-ACK. UDP: listener stays alive, prints each arriving packet, sends echo reply. Press Ctrl+C to release the mapping and exit.
+
+Note: routers typically rate-limit repeated probes from the same source, so 3/5 nping responses on TCP is normal and acceptable.
+
+---
+
+
 
 SSDP (step 1) is spec-compliant and works with any UPnP-enabled router.
 
