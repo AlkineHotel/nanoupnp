@@ -556,7 +556,7 @@ static int http_request(const char *method, const char *url,
     }
 
     /* Read response */
-    sbuf_init(resp_body);
+    if (sbuf_init(resp_body) != 0) { sock_close(s); return -1; }
     while ((n = (int)recv(s, tmp, sizeof(tmp), 0)) > 0)
         sbuf_append(resp_body, tmp, n);
     sock_close(s);
