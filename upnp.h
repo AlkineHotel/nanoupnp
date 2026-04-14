@@ -28,6 +28,8 @@ extern "C" {
 #define UPNP_HOST_MAX   128
 #define UPNP_IP_MAX      48
 
+/* Internal — not part of the public API; exposed here only because
+ * UPnPMapping embeds it by value.  Do not access fields directly. */
 typedef struct {
     char control_url[UPNP_URL_MAX];
     char service_type[128];
@@ -44,7 +46,12 @@ typedef struct {
 
 /*
  * Discover IGD, get external IP, open port mapping.
- * Returns 0 on success; fills *m.  verbosity: 0=silent, 2=info, 4=debug.
+ * Returns 0 on success; fills *m.
+ *
+ * verbosity:  0 = silent
+ *             1 = result only (mapping granted / failed)
+ *             2 = info (discovery steps, LAN IP, external address)
+ *             4 = debug (every probe URL, raw SOAP responses)
  */
 int  upnp_request_mapping(unsigned short port, const char *proto,
                           int verbosity, UPnPMapping *m);
