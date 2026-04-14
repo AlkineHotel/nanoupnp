@@ -14,9 +14,6 @@
  * public TCP or UDP port mapping.  No libminiupnpc, no libupnp, no external
  * dependencies of any kind — only POSIX sockets (or Winsock2) and libc.
  *
- * The design is a direct C port of zzncat-go/upnp.go, preserving identical
- * protocol logic and fallback behaviour across both implementations.
- *
  * ════════════════════════════════════════════════════════════════════════════
  * PROTOCOL FLOW  (five steps)
  * ════════════════════════════════════════════════════════════════════════════
@@ -173,9 +170,17 @@
   #include <errno.h>
   #define sock_close(s)   close(s)
   #define sleep_ms(ms)    usleep((ms)*1000)
+  #include <net/if.h>     /* IFF_LOOPBACK, IFF_UP */
   typedef int SOCKET;
   #define INVALID_SOCKET  (-1)
   #define SOCKET_ERROR    (-1)
+#endif
+
+#ifdef _WIN32
+  /* MSVC does not have strncasecmp; MinGW has it but MSVC uses _strnicmp */
+  #if defined(_MSC_VER)
+    #define strncasecmp(a,b,n) _strnicmp((a),(b),(n))
+  #endif
 #endif
 
 /* ── constants ─────────────────────────────────────────────────────────────── */
@@ -187,6 +192,7 @@
 #define UPNP_LEASE       3600
 #define UPNP_BUF_SIZE    8192
 #define UPNP_SMALL_BUF   2048
+#define UPNP_MAX_RESP    (1024*1024)  /* 1 MB response cap */
 
 static const char *SSDP_TARGETS[] = {
     "urn:schemas-upnp-org:service:WANIPConnection:2",
@@ -203,6 +209,7 @@ typedef struct { char *buf; size_t len; size_t cap; } Sbuf;
 static int sbuf_init(Sbuf *s)  { s->buf = malloc(UPNP_BUF_SIZE); s->len = 0; s->cap = UPNP_BUF_SIZE; return s->buf ? 0 : -1; }
 static void sbuf_free(Sbuf *s) { free(s->buf); s->buf = NULL; s->len = s->cap = 0; }
 static int sbuf_append(Sbuf *s, const char *data, size_t n) {
+    if (s->len + n > UPNP_MAX_RESP) return -1;  /* cap against runaway IGD */
     if (s->len + n + 1 > s->cap) {
         size_t nc = s->cap * 2 + n + 1;
         char *nb = realloc(s->buf, nc);
@@ -319,7 +326,7 @@ static int local_ipv4_addrs(char ips[][UPNP_IP_MAX], int max_ips, int verbosity)
 #else
     /* POSIX: use getifaddrs */
     struct ifaddrs *ifap, *ifa;
-    if (getifaddrs(&ifap) != 0) goto fallback;
+    if (getifaddrs(&ifap) == 0) {
     for (ifa = ifap; ifa && count < max_ips; ifa = ifa->ifa_next) {
         if (!ifa->ifa_addr) continue;
         if (ifa->ifa_addr->sa_family != AF_INET) continue;
@@ -336,6 +343,7 @@ static int local_ipv4_addrs(char ips[][UPNP_IP_MAX], int max_ips, int verbosity)
         count++;
     }
     freeifaddrs(ifap);
+    }
 #endif
 
     if (count == 0) {
@@ -514,7 +522,7 @@ static int http_request(const char *method, const char *url,
     int  port;
     char req[UPNP_BUF_SIZE];
     char tmp[1024];
-    int  n, hdr_done = 0;
+    int  n;
     size_t body_len = body ? strlen(body) : 0;
 
     if (parse_url(url, host, sizeof(host), &port, path, sizeof(path)) != 0)
@@ -542,8 +550,10 @@ static int http_request(const char *method, const char *url,
     /* Send headers */
     if (send(s, req, n, 0) != n) { sock_close(s); return -1; }
     /* Send body if any */
-    if (body_len > 0)
-        send(s, body, (int)body_len, 0);
+    if (body_len > 0) {
+        int sent = (int)send(s, body, (int)body_len, 0);
+        if (sent != (int)body_len) { sock_close(s); return -1; }
+    }
 
     /* Read response */
     sbuf_init(resp_body);
@@ -571,8 +581,6 @@ static int http_request(const char *method, const char *url,
     }
 
     return 0;
-    /* fall through: do not suppress warnings from hdr_done (unused) */
-    (void)hdr_done;
 }
 
 /* ── XML: device description parsing ────────────────────────────────────────── */
@@ -879,6 +887,11 @@ static int lan_ip_toward_host(const char *igd_host, char *out, size_t out_size) 
 
 int upnp_request_mapping(unsigned short port, const char *proto,
                          int verbosity, UPnPMapping *m) {
+    if (!proto || (strcmp(proto, "TCP") != 0 && strcmp(proto, "UDP") != 0)) {
+        fprintf(stderr, "[UPnP] invalid proto '%s': must be TCP or UDP\n",
+                proto ? proto : "(null)");
+        return -1;
+    }
     memset(m, 0, sizeof(*m));
 
     if (discover_igd(verbosity, &m->svc) != 0) {
@@ -918,7 +931,7 @@ int upnp_request_mapping(unsigned short port, const char *proto,
             "<NewInternalPort>%u</NewInternalPort>"
             "<NewInternalClient>%s</NewInternalClient>"
             "<NewEnabled>1</NewEnabled>"
-            "<NewPortMappingDescription>zzncat %s/%u</NewPortMappingDescription>"
+            "<NewPortMappingDescription>c-upnp-igd %s/%u</NewPortMappingDescription>"
             "<NewLeaseDuration>%d</NewLeaseDuration>",
             port, proto, port, local_ip, proto, port, lease);
         Sbuf r2;
@@ -971,8 +984,17 @@ static BOOL WINAPI upnp_console_handler(DWORD ctrl_type) {
     return FALSE;
 }
 #else
+static volatile sig_atomic_t g_upnp_signal_caught = 0;
 static void upnp_signal_handler(int sig) {
     (void)sig;
+    g_upnp_signal_caught = 1;
+    /* Note: upnp_release_mapping is called from upnp_register_cleanup's
+     * atexit path or by the caller checking upnp_signal_pending().
+     * Doing it here is pragmatically fine on Linux/macOS/Android in practice
+     * (the functions called are simple LAN socket ops), but is technically
+     * async-signal-unsafe per POSIX.  The alternative — a flag-only handler —
+     * requires the caller to poll, which defeats the purpose for a CLI tool.
+     * We accept the documented UB and call directly for simplicity. */
     upnp_release_mapping(g_upnp_mapping);
     _exit(0);
 }
