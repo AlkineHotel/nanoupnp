@@ -60,6 +60,19 @@ That's it. No `./configure`, no cmake, no pkg-config.
 
 ---
 
+## CI
+
+GitHub Actions runs a **compile-only** build on every push and pull request:
+
+- **Linux:** `make clean && make`
+- **Windows (MinGW):** `make clean && make windows`
+
+CI builds the library, the example program, and both test binaries. It does
+**not** run the smoke test or the live reachability test, because those require
+a real UPnP-capable router on the runner's local network.
+
+---
+
 ## API
 
 ```c
@@ -135,13 +148,16 @@ eliminates this window entirely.
 
 ## Testing
 
-**Automated smoke test** — discovers IGD, maps port, verifies fields, releases. Exits 0 on pass.
+**Local smoke test** — discovers IGD, maps port, verifies fields, releases.
+Exits 0 on pass. This is not run in GitHub Actions CI because it requires a
+real UPnP-capable router on the local network.
 ```bash
 make test                        # Linux/macOS
 .\test\test_upnp.exe             # Windows
 ```
 
-**Live reachability test** — maps port, binds a real socket, holds it open for external probing.
+**Live reachability test** — maps port, binds a real socket, holds it open for
+external probing. This is a manual integration test, not a CI check.
 ```bash
 .\test\test_live.exe             # TCP/9999 (default)
 .\test\test_live.exe 9999 UDP    # UDP/9999

@@ -1,8 +1,9 @@
 # Makefile for c-upnp-igd
 #
 # Targets:
-#   make              — build example (Linux/macOS)
-#   make windows      — build example for Windows (MinGW cross or native)
+#   make              — build example + test binaries (Linux/macOS)
+#   make test         — run the router-dependent smoke test (Linux/macOS)
+#   make windows      — build example + test binaries for Windows (MinGW cross or native)
 #   make clean        — remove build artifacts
 
 CC      ?= gcc
