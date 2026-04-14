@@ -5,7 +5,7 @@
 A minimal, zero-dependency UPnP IGD port mapping client in C.
 
 Drop `upnp.c` and `upnp.h` into any C project to open public ports on a
-UPnP-capable router — no build system, no third-party libraries, no cmake.
+UPnP-capable router ... no build system, no third-party libraries, no cmake.
 
 **Tested on:** Windows x64 (MinGW + MSVC), Linux x86_64, Linux ARM64 (Termux/Android)
 
@@ -18,7 +18,7 @@ it's 30+ files, requires a build step, and adds a meaningful dependency surface
 to any project that uses it.
 
 `nanoupnp` is two files. It implements exactly the four SOAP actions needed
-to open and close a port mapping — nothing more.
+to open and close a port mapping... nothing more.
 
 ---
 
@@ -97,27 +97,27 @@ void upnp_register_cleanup(UPnPMapping *m);
 
 ## Protocol
 
-Five steps, all implemented with raw sockets and libc — no HTTP library, no XML
+Five steps, all implemented with raw sockets and libc ... no HTTP library, no XML
 parser, no SOAP framework:
 
-1. **SSDP M-SEARCH** — UDP multicast to `239.255.255.250:1900`. Sent on every
+1. **SSDP M-SEARCH** ... UDP multicast to `239.255.255.250:1900`. Sent on every
    non-loopback IPv4 interface simultaneously so the packet egresses the correct
    physical NIC even on machines with WSL/Hyper-V/VPN virtual adapters.
 
-2. **Direct gateway probe** — fallback when SSDP multicast is filtered. Derives
+2. **Direct gateway probe** ... fallback when SSDP multicast is filtered. Derives
    candidate gateway addresses from local /24 prefixes and HTTP-probes common
    IGD description paths.
 
-3. **Device description fetch** — HTTP/1.0 GET of the router's IGD XML.
+3. **Device description fetch** ... HTTP/1.0 GET of the router's IGD XML.
    Extracts `controlURL` for `WANIPConnection` (v1/v2) or `WANPPPConnection`
    using a minimal text scraper. No DOM, no SAX.
 
-4. **SOAP calls** — hand-built envelopes sent over plain TCP. Handles UPnP
+4. **SOAP calls** ... hand-built envelopes sent over plain TCP. Handles UPnP
    SOAP fault envelopes (HTTP 500 with `<errorCode>` / `<errorDescription>`).
    `AddPortMapping` tries `NewLeaseDuration=3600` first, falls back to `0` for
    routers (e.g. Eero) that reject finite leases.
 
-5. **LAN IP detection** — `connect()` a UDP socket toward the IGD host and read
+5. **LAN IP detection** ... `connect()` a UDP socket toward the IGD host and read
    back `getsockname()`. No packets sent; the kernel's routing table picks the
    correct LAN interface automatically.
 
@@ -150,7 +150,7 @@ eliminates this window entirely.
 
 ## Testing
 
-**Local smoke test** — discovers IGD, maps port, verifies fields, releases.
+**Local smoke test** ... discovers IGD, maps port, verifies fields, releases.
 Exits 0 on pass. This is not run in GitHub Actions CI because it requires a
 real UPnP-capable router on the local network.
 ```bash
@@ -158,7 +158,7 @@ make test                        # Linux/macOS
 .\test\test_upnp.exe             # Windows
 ```
 
-**Live reachability test** — maps port, binds a real socket, holds it open for
+**Live reachability test** ... maps port, binds a real socket, holds it open for
 external probing. This is a manual integration test, not a CI check.
 ```bash
 .\test\test_live.exe             # TCP/9999 (default)
