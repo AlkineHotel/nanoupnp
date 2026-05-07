@@ -1,0 +1,7 @@
+/home/runner/work/nanoupnp/nanoupnp/build/shared/CMakeFiles/nanoupnp.dir
+/home/runner/work/nanoupnp/nanoupnp/build/shared/CMakeFiles/edit_cache.dir
+/home/runner/work/nanoupnp/nanoupnp/build/shared/CMakeFiles/rebuild_cache.dir
+/home/runner/work/nanoupnp/nanoupnp/build/shared/CMakeFiles/list_install_components.dir
+/home/runner/work/nanoupnp/nanoupnp/build/shared/CMakeFiles/install.dir
+/home/runner/work/nanoupnp/nanoupnp/build/shared/CMakeFiles/install/local.dir
+/home/runner/work/nanoupnp/nanoupnp/build/shared/CMakeFiles/install/strip.dir

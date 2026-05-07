@@ -1,0 +1,7 @@
+/home/runner/work/nanoupnp/nanoupnp/build/install/lib/libnanoupnp.a
+/home/runner/work/nanoupnp/nanoupnp/build/install/include/upnp.h
+/home/runner/work/nanoupnp/nanoupnp/build/install/share/nanoupnp/LICENSE
+/home/runner/work/nanoupnp/nanoupnp/build/install/lib/cmake/nanoupnp/nanoupnpTargets.cmake
+/home/runner/work/nanoupnp/nanoupnp/build/install/lib/cmake/nanoupnp/nanoupnpTargets-release.cmake
+/home/runner/work/nanoupnp/nanoupnp/build/install/lib/cmake/nanoupnp/nanoupnpConfig.cmake
+/home/runner/work/nanoupnp/nanoupnp/build/install/lib/cmake/nanoupnp/nanoupnpConfigVersion.cmake
