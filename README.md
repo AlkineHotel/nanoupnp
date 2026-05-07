@@ -5,7 +5,7 @@
 A minimal, zero-dependency UPnP IGD port mapping client in C.
 
 Drop `upnp.c` and `upnp.h` into any C project to open public ports on a
-UPnP-capable router ... no build system, no third-party libraries, no cmake.
+UPnP-capable router ... no third-party libraries required.
 
 **Tested on:** Windows x64 (MinGW + MSVC), Linux x86_64, Linux ARM64 (Termux/Android)
 
@@ -58,7 +58,21 @@ gcc -o yourprogram.exe yourprogram.c upnp.c -I. -lws2_32 -liphlpapi
 cl yourprogram.c upnp.c /I. ws2_32.lib iphlpapi.lib
 ```
 
-That's it. No `./configure`, no cmake, no pkg-config.
+That's it. No `./configure`, no pkg-config.
+
+**CMake install / package build:**
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+cmake --install build --prefix /tmp/nanoupnp-install
+```
+
+Downstream CMake consumers can then use:
+
+```cmake
+find_package(nanoupnp CONFIG REQUIRED)
+target_link_libraries(your_target PRIVATE nanoupnp::nanoupnp)
+```
 
 ---
 
@@ -68,10 +82,25 @@ GitHub Actions runs a **compile-only** build on every push and pull request:
 
 - **Linux:** `make clean && make`
 - **Windows (MinGW):** `make clean && make windows`
+- **CMake install check:** configure, build, and install `nanoupnp`
 
 CI builds the library, the example program, and both test binaries. It does
 **not** run the smoke test or the live reachability test, because those require
 a real UPnP-capable router on the runner's local network.
+
+---
+
+## vcpkg readiness
+
+`nanoupnp` now ships a minimal CMake install/export setup so a vcpkg port can
+build the library, install `upnp.h`, and expose `nanoupnp::nanoupnp` via
+`find_package(nanoupnp CONFIG REQUIRED)`.
+
+Typical release flow:
+
+1. Tag a release in this repository.
+2. Point a vcpkg `portfile.cmake` at that release archive.
+3. Install the library/header/package config through CMake.
 
 ---
 

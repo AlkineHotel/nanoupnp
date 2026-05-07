@@ -41,3 +41,15 @@ jobs:
         if: runner.os == 'Windows'
         shell: msys2 {0}
         run: make clean && make windows
+
+      - name: Configure CMake
+        run: >-
+          cmake -S . -B build/cmake
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/build/install
+
+      - name: Build with CMake
+        run: cmake --build build/cmake --config Release
+
+      - name: Install with CMake
+        run: cmake --install build/cmake --config Release
