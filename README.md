@@ -5,7 +5,7 @@
 A minimal, zero-dependency UPnP IGD port mapping client in C.
 
 Drop `upnp.c` and `upnp.h` into any C project to open public ports on a
-UPnP-capable router ... no third-party libraries required.
+UPnP-capable router ... no third-party libraries and no required build system.
 
 **Tested on:** Windows x64 (MinGW + MSVC), Linux x86_64, Linux ARM64 (Termux/Android)
 
@@ -58,9 +58,10 @@ gcc -o yourprogram.exe yourprogram.c upnp.c -I. -lws2_32 -liphlpapi
 cl yourprogram.c upnp.c /I. ws2_32.lib iphlpapi.lib
 ```
 
-That's it. No `./configure`, no pkg-config.
+That's it. No `./configure`, no pkg-config, and no CMake needed for the basic
+drop-in workflow.
 
-**CMake install / package build:**
+**Optional CMake install / package build:**
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
