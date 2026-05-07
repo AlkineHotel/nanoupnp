@@ -91,17 +91,25 @@ a real UPnP-capable router on the runner's local network.
 
 ---
 
-## vcpkg readiness
+## vcpkg packaging
 
-`nanoupnp` now ships a minimal CMake install/export setup so a vcpkg port can
-build the library, install `upnp.h`, and expose `nanoupnp::nanoupnp` via
-`find_package(nanoupnp CONFIG REQUIRED)`.
+`nanoupnp` now ships the upstream CMake install/export surface needed for the
+public vcpkg registry.
 
-Typical release flow:
+This repository also includes reference submission files in
+[`packaging/vcpkg`](packaging/vcpkg):
+
+- [`vcpkg.json`](packaging/vcpkg/vcpkg.json)
+- [`portfile.cmake`](packaging/vcpkg/portfile.cmake)
+- [`usage`](packaging/vcpkg/usage)
+
+Typical public-registry flow:
 
 1. Tag a release in this repository.
-2. Point a vcpkg `portfile.cmake` at that release archive.
-3. Install the library/header/package config through CMake.
+2. Update `packaging/vcpkg/vcpkg.json` and `packaging/vcpkg/portfile.cmake`
+   for that release archive and checksum.
+3. Copy those files into `ports/nanoupnp/` in a vcpkg pull request.
+4. Let the port build/install the library, header, and exported CMake package.
 
 ---
 

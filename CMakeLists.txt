@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(nanoupnp VERSION 0.1.0 LANGUAGES C)
+project(nanoupnp VERSION 0.2.71828 LANGUAGES C)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)

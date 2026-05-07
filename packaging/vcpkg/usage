@@ -1,0 +1,8 @@
+nanoupnp provides a CMake package:
+
+  find_package(nanoupnp CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE nanoupnp::nanoupnp)
+
+The public header is:
+
+  #include <upnp.h>

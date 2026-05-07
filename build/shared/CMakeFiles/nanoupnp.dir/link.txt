@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/nanoupnp.dir/link.d -shared -Wl,-soname,libnanoupnp.so.0 -o libnanoupnp.so.0.1.0 CMakeFiles/nanoupnp.dir/upnp.c.o

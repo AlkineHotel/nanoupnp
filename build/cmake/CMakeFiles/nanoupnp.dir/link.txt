@@ -1,2 +1,0 @@
-/usr/bin/ar qc libnanoupnp.a CMakeFiles/nanoupnp.dir/upnp.c.o
-/usr/bin/ranlib libnanoupnp.a

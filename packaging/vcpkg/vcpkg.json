@@ -1,0 +1,7 @@
+{
+  "name": "nanoupnp",
+  "version-semver": "0.2.71828",
+  "description": "A minimal, zero-dependency UPnP IGD port mapping client in C.",
+  "homepage": "https://github.com/AlkineHotel/nanoupnp",
+  "license": "MIT"
+}

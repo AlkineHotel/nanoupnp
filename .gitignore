@@ -6,3 +6,4 @@ test/test_live
 test/test_live.exe
 *.o
 *.a
+build/
