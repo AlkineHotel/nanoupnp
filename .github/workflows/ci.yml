@@ -41,3 +41,57 @@ jobs:
         if: runner.os == 'Windows'
         shell: msys2 {0}
         run: make clean && make windows
+
+      - name: Configure CMake
+        run: >-
+          cmake -S . -B build/cmake
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/build/install
+
+      - name: Build with CMake
+        run: cmake --build build/cmake --config Release
+
+      - name: Install with CMake
+        run: cmake --install build/cmake --config Release
+
+      - name: Verify installed CMake package on Linux
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          mkdir -p build/consumer
+          cat > build/consumer/CMakeLists.txt <<'EOF'
+          cmake_minimum_required(VERSION 3.16)
+          project(nanoupnp_consumer LANGUAGES CXX)
+
+          find_package(nanoupnp CONFIG REQUIRED)
+
+          add_executable(nanoupnp_consumer main.cpp)
+          target_link_libraries(nanoupnp_consumer PRIVATE nanoupnp::nanoupnp)
+          EOF
+          cat > build/consumer/main.cpp <<'EOF'
+          int main() { return 0; }
+          EOF
+          cmake -S build/consumer -B build/consumer-build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_PREFIX_PATH="${{ github.workspace }}/build/install"
+
+      - name: Verify installed CMake package on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path build/consumer | Out-Null
+          @"
+          cmake_minimum_required(VERSION 3.16)
+          project(nanoupnp_consumer LANGUAGES CXX)
+
+          find_package(nanoupnp CONFIG REQUIRED)
+
+          add_executable(nanoupnp_consumer main.cpp)
+          target_link_libraries(nanoupnp_consumer PRIVATE nanoupnp::nanoupnp)
+          "@ | Set-Content -Path build/consumer/CMakeLists.txt
+          @"
+          int main() { return 0; }
+          "@ | Set-Content -Path build/consumer/main.cpp
+          cmake -S build/consumer -B build/consumer-build `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DCMAKE_PREFIX_PATH="${{ github.workspace }}/build/install"
